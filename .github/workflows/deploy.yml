@@ -17,6 +17,8 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -44,21 +46,37 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_WEDDING_PROJECT_ID: ${{ vars.VITE_WEDDING_PROJECT_ID }}
-      - uses: actions/upload-pages-artifact@v5
+      - name: Include GitHub Pages marker
+        if: github.event_name != 'pull_request'
+        run: touch dist/.nojekyll
+      - uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'
         with:
-          path: dist
+          name: wedding-site
+          path: dist/
+          include-hidden-files: true
+          retention-days: 1
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: validate
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
-      pages: write
-      id-token: write
+      contents: write
     steps:
-      - uses: actions/deploy-pages@v5
-        id: deployment
+      - uses: actions/download-artifact@v4
+        with:
+          name: wedding-site
+          path: dist
+      - name: Verify static site artifact
+        run: |
+          test -f dist/index.html || { echo "::error::Build output dist/index.html is missing."; exit 1; }
+          test -f dist/.nojekyll || { echo "::error::GitHub Pages marker dist/.nojekyll is missing."; exit 1; }
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "Deploy ${{ github.sha }}"
