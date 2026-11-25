@@ -13,7 +13,7 @@ export const supabase = url && publishableKey
         flowType: "pkce",
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true
+        detectSessionInUrl: false
       }
     })
   : null;
