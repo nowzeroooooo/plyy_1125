@@ -3,6 +3,7 @@ import type { PropsWithChildren } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase, supabaseConfigError } from "./supabase";
+import { formatOAuthError, getOAuthRedirectUrl, processOAuthCallback } from "./oauth";
 import type { Project } from "../types";
 import { AuthContext } from "./auth-context";
 import type { AuthState } from "./auth-context";
@@ -91,15 +92,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
       }
       return;
     }
-    void supabase.auth.getSession().then(({ data, error }) => {
-      if (error) {
-        setState({ status: "error", user: null, project: null, role: null, error: error.message });
-        return;
+    void (async () => {
+      try {
+        await processOAuthCallback(supabase);
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        setSession(data.session);
+      } catch (error) {
+        setState({ status: "error", user: null, project: null, role: null, error: formatOAuthError(error) });
       }
-      setSession(data.session);
-    }).catch((error: unknown) => {
-      setState({ status: "error", user: null, project: null, role: null, error: errorMessage(error) });
-    });
+    })();
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!nextSession) queryClient.clear();
       setSession(nextSession);
@@ -113,7 +115,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const signIn = useCallback(async () => {
     if (!supabase) throw new Error("로그인을 위해 Supabase 설정이 필요합니다.");
-    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const redirectTo = getOAuthRedirectUrl(window.location);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo }
