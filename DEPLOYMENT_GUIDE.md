@@ -2,12 +2,12 @@
 
 ## GitHub Pages
 
-1. 저장소 Settings > Pages > Build and deployment > Source에서 **Deploy from a branch**를 선택합니다.
-2. Branch에서 `gh-pages`와 `/(root)`를 선택하고 Save를 누릅니다. 브랜치는 첫 배포 시 워크플로가 자동 생성합니다.
-3. Settings > Secrets and variables > Actions > Variables에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`를 등록합니다. 이 Publishable Key는 브라우저에 포함되므로 권한은 RLS로 보호해야 합니다. `service_role`/Secret Key 또는 OAuth 비밀키는 절대 등록하거나 노출하지 마세요.
-4. `main` 브랜치에 push하거나 Actions > Deploy Our Wedding > Run workflow로 수동 실행합니다. workflow는 타입 검사, ESLint, 테스트, 빌드가 모두 성공해야 배포합니다. Pull Request는 검증만 수행하고 `gh-pages`를 변경하지 않습니다.
-5. workflow의 배포 job은 `dist`만 `gh-pages` 브랜치에 orphan commit으로 게시하고 `.nojekyll`을 포함합니다. 브랜치에는 빌드 파일만 저장됩니다.
-6. 프로젝트 사이트 URL은 `https://<GitHub 사용자명>.github.io/<저장소명>/` 형식입니다. 현재 실제 배포 여부/URL은 Actions 실행과 Pages 설정 완료 전에는 확인할 수 없습니다.
+1. 저장소 Settings > Secrets and variables > Actions > Variables에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`를 등록합니다. 이 Publishable Key는 브라우저에 포함되므로 권한은 RLS로 보호해야 합니다. `service_role`/Secret Key 또는 OAuth 비밀키는 절대 등록하거나 노출하지 마세요.
+2. Settings > Actions > General에서 저장소 정책이 `GITHUB_TOKEN`의 `contents: write`를 허용하는지 확인합니다. workflow는 배포 job에만 해당 권한을 부여합니다.
+3. 변경사항을 `main`에 병합하면 자동 배포됩니다. 또는 Actions > Deploy Our Wedding > Run workflow에서 `main`을 선택해 수동 실행할 수 있습니다. 타입 검사, ESLint, 테스트, 빌드가 모두 성공해야 배포하며 Pull Request는 브랜치를 수정하지 않고 검증만 수행합니다.
+4. 첫 배포 후 저장소에 `gh-pages` 브랜치가 생성됐는지 확인합니다. Settings > Pages > Build and deployment > Source에서 **Deploy from a branch**, Branch `gh-pages`, 폴더 `/(root)`를 선택하고 Save를 누릅니다.
+5. workflow는 `dist`만 `gh-pages` 브랜치에 orphan commit으로 게시하고 `.nojekyll`을 포함합니다. 빌드 job 전달용 임시 artifact는 하루 뒤 삭제됩니다. 배포 브랜치에는 빌드 파일만 저장됩니다.
+6. 프로젝트 사이트 URL은 `https://<GitHub 사용자명>.github.io/<저장소명>/` 형식입니다. 첫 배포와 Pages 설정이 완료되기 전에는 실제 접속 여부를 확인할 수 없습니다.
 
 Vite는 Actions의 `GITHUB_REPOSITORY`에서 프로젝트 하위 경로를 계산하며 `plyy_1125` 저장소는 `/plyy_1125/`를 사용합니다. `<사용자명>.github.io` 저장소는 루트 경로로 배포합니다. 라우팅은 HashRouter라 서버 rewrite가 필요하지 않습니다.
 
