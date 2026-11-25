@@ -2,12 +2,14 @@
 
 ## GitHub Pages
 
-1. 저장소 Settings > Pages > Build and deployment > Source에서 **GitHub Actions**를 선택합니다.
-2. Settings > Secrets and variables > Actions > Variables에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`를 등록합니다. 이 Publishable Key는 브라우저에 포함되므로 권한은 RLS로 보호해야 합니다. 비밀키를 넣지 마세요.
-3. `main` 브랜치에 push하거나 Actions > Deploy Our Wedding > Run workflow를 실행합니다. workflow는 타입 검사, ESLint, 테스트, 빌드가 모두 성공해야 배포합니다.
-4. 프로젝트 사이트 URL은 `https://<GitHub 사용자명>.github.io/<저장소명>/` 형식입니다. 현재 실제 배포 여부/URL은 Actions 실행 및 Pages 설정 완료 전에는 확인할 수 없습니다.
+1. 저장소 Settings > Pages > Build and deployment > Source에서 **Deploy from a branch**를 선택합니다.
+2. Branch에서 `gh-pages`와 `/(root)`를 선택하고 Save를 누릅니다. 브랜치는 첫 배포 시 워크플로가 자동 생성합니다.
+3. Settings > Secrets and variables > Actions > Variables에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`를 등록합니다. 이 Publishable Key는 브라우저에 포함되므로 권한은 RLS로 보호해야 합니다. `service_role`/Secret Key 또는 OAuth 비밀키는 절대 등록하거나 노출하지 마세요.
+4. `main` 브랜치에 push하거나 Actions > Deploy Our Wedding > Run workflow로 수동 실행합니다. workflow는 타입 검사, ESLint, 테스트, 빌드가 모두 성공해야 배포합니다. Pull Request는 검증만 수행하고 `gh-pages`를 변경하지 않습니다.
+5. workflow의 배포 job은 `dist`만 `gh-pages` 브랜치에 orphan commit으로 게시하고 `.nojekyll`을 포함합니다. 브랜치에는 빌드 파일만 저장됩니다.
+6. 프로젝트 사이트 URL은 `https://<GitHub 사용자명>.github.io/<저장소명>/` 형식입니다. 현재 실제 배포 여부/URL은 Actions 실행과 Pages 설정 완료 전에는 확인할 수 없습니다.
 
-Vite는 Actions의 `GITHUB_REPOSITORY`에서 프로젝트 하위 경로를 계산하며 `<사용자명>.github.io` 저장소는 루트 경로로 배포합니다. 라우팅은 HashRouter라 서버 rewrite가 필요하지 않습니다.
+Vite는 Actions의 `GITHUB_REPOSITORY`에서 프로젝트 하위 경로를 계산하며 `plyy_1125` 저장소는 `/plyy_1125/`를 사용합니다. `<사용자명>.github.io` 저장소는 루트 경로로 배포합니다. 라우팅은 HashRouter라 서버 rewrite가 필요하지 않습니다.
 
 ## 로컬 개발 및 데모
 

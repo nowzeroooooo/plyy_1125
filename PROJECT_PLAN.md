@@ -9,6 +9,7 @@
 - [x] 승인된 프로젝트 멤버가 아닌 사용자의 접근 차단, RLS 및 멱등 기본 데이터 초기화
 - [x] 홈, 체크리스트, 일정, 예산 및 업체의 기본 CRUD 기반
 - [x] GitHub Actions 검증 및 Pages 배포 파이프라인
+- [x] Pages 빌드 결과를 `.nojekyll` 포함 `gh-pages` 브랜치에 배포하도록 전환
 - [ ] 실제 Supabase 프로젝트/두 계정 구성 및 두 기기 실시간 검증(외부 설정 필요)
 
 ## Phase 2 — 핵심 기능
@@ -38,3 +39,4 @@
 
 - 저장소 초기 상태에서 구현을 시작했습니다. 앱 코드를 추가한 뒤 가능한 로컬 타입 검사, 린트, 테스트, production build를 수행하고 결과를 작업 보고에 기록합니다.
 - OAuth, RLS 정책, Storage 권한, 실시간 다중 사용자 동작은 실제 Supabase 프로젝트 설정 전까지 미검증입니다.
+- `gh-pages` 자동 배포는 GitHub Actions 권한과 Pages Source를 해당 브랜치로 설정한 뒤 검증해야 합니다.
