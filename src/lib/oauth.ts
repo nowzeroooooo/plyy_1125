@@ -59,7 +59,7 @@ export async function processOAuthCallback(
 
   const exchange = client.auth.exchangeCodeForSession(code).then(({ error }) => {
     if (error) throw error;
-    cleanOAuthCallbackUrl(window.location);
+    cleanOAuthCallbackUrl(location);
   });
   exchangePromises.set(code, exchange);
 
