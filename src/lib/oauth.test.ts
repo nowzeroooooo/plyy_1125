@@ -52,6 +52,18 @@ describe("OAuth callback helpers", () => {
     expect(exchange).toHaveBeenCalledTimes(2);
   });
 
+  it("does not exchange the same successful code again", async () => {
+    const location = mockLocation("?code=used-code");
+    const exchange = vi.fn().mockResolvedValue({ error: null });
+    const client = mockClient(exchange);
+
+    await processOAuthCallback(client, location);
+    window.history.replaceState({}, "", "/plyy_1125/?code=used-code#/");
+    await processOAuthCallback(client, window.location);
+
+    expect(exchange).toHaveBeenCalledTimes(1);
+  });
+
   it("cleans provider and callback query parameters", () => {
     const location = mockLocation("?error=access_denied", "#/settings");
     cleanOAuthCallbackUrl(location);
